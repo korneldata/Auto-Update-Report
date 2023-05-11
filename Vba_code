@@ -1,0 +1,60 @@
+Sub ReportUpdate()
+
+'Get last row number in partial report
+  Lr = ActiveSheet.Cells(Rows.Count, 1).End(xlUp).Row
+
+'Get last column number in partial report
+  Lc = ActiveSheet.Cells(1, Columns.Count).End(xlToLeft).Column
+
+'Concatenate day, month and year
+ 
+  For b = 2 To Lr
+
+  D = CStr(Cells(b, "C"))
+  M = Cells(b, "B")
+  Y = CStr(Cells(b, "D"))
+ 
+Dat = D & " " & M & " " & " " & Y
+
+'Format as a proper date
+
+  DateFormat = DateValue(Dat)
+
+'Populate new column with dates
+
+  Cells(b, Lc + 1) = DateFormat
+
+  Next b
+
+'Calculate overhours for each row
+
+  For A = 2 To Lr
+
+  Time2 = Cells(A, "F")
+  Time1 = Cells(A, "E")
+
+  Overhours = DateDiff("h", Time1, Time2)
+
+'Add new column with overhours data
+
+  Cells(A, Lc + 2) = Overhours
+
+  Next A
+
+'Get last row in main report
+
+  Lrow = Sheet2.Cells(Rows.Count, 1).End(xlUp).Row
+
+'Copy input from partial report to main report
+
+  ActiveSheet.Range("A2:A" & Lr).Copy _
+    Destination:=Sheet2.Range("A" & Lrow + 1)
+    
+  ActiveSheet.Range(Cells(2, Lc + 1), Cells(Lr, Lc + 2)).Copy _
+    Destination:=Sheet2.Range("B" & Lrow + 1)
+
+'Refresh pivot table in Sheet3
+
+  Sheet3.PivotTables("PivotTable1").RefreshTable
+
+End Sub
